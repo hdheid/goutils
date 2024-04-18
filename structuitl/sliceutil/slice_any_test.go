@@ -51,7 +51,7 @@ func TestMergeSlice(t *testing.T) {
 		},
 	}
 
-	mergeList := MergeSlice[Map](listA, listB, func(a, b Map) (Map, bool) {
+	mergeList := MergeSliceWithAny[Map](listA, listB, func(a, b Map) (Map, bool) {
 		if a.CountryName == b.CountryName {
 			return Map{
 				CountryName: a.CountryName,

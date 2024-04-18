@@ -3,6 +3,7 @@ package cdir
 import (
 	"errors"
 	"fmt"
+	"github.com/hdheid/goutils/common"
 	"github.com/hdheid/goutils/iputil"
 	"net"
 	"strconv"
@@ -28,10 +29,10 @@ func GetIPs(CDIR string) ([]string, error) {
 	}
 
 	t, _ := iputil.CheckIPType(ip.String()) // 获取IP类型，网段不能够太大
-	if t == iputil.TypeIPv4 && maskCount < 19 {
+	if t == common.TypeIPv4 && maskCount < 19 {
 		return nil, errors.New(fmt.Sprintf("The network segment is too large: %d", maskCount))
 	}
-	if t == iputil.TypeIPv6 && maskCount < 115 {
+	if t == common.TypeIPv6 && maskCount < 115 {
 		return nil, errors.New(fmt.Sprintf("The network segment is too large: %d", maskCount))
 	}
 
