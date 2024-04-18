@@ -31,3 +31,8 @@ type NumberData interface {
 type BasicData interface {
 	BooleanData | StringData | IntegerData | FloatData
 }
+
+// IfElse ? : 语法
+type IfElse interface {
+	~bool | any
+}
