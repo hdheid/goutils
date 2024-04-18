@@ -5,7 +5,7 @@ import (
 )
 
 /*
-切片的基本操作
+	基础数据的切片的基本操作
 */
 
 type CompareFunc[T common.BasicData] func(a, b T) bool
@@ -68,8 +68,8 @@ s == {"a","b","c"}=> s == {"c","b","a"}
 s == {"a","b","c"} => s == {"a","b","c"}, s_reverse == {"c","b","a"}
 */
 
-// ReverseSlice 反转函数
-func ReverseSlice[T any](carrier []T) {
+// ReverseSliceWithAny 反转切片
+func ReverseSliceWithAny[T any](carrier []T) {
 	length := len(carrier)
 
 	for i := 0; i < length/2; i++ {
@@ -77,8 +77,8 @@ func ReverseSlice[T any](carrier []T) {
 	}
 }
 
-// ReverseDeep 反转函数，深拷贝
-func ReverseDeep[T any](carrier []T) []T {
+// ReverseDeepWithAny 反转函数，深拷贝
+func ReverseDeepWithAny[T any](carrier []T) []T {
 	length := len(carrier)
 	NewCarrier := DeepCopySlice(carrier)
 
@@ -106,4 +106,46 @@ func UniqueSlice[T common.NumberData](carrier []T) []T {
 	}
 
 	return newList
+}
+
+func MergeSlice[T common.BasicData](carrierA, carrierB []T) []T {
+	newCarrier := make([]T, 0, len(carrierA)+len(carrierB))
+
+	// 合并数值相同的数据
+	for _, objA := range carrierA {
+		for _, objB := range carrierB {
+			if objB == objA {
+				newCarrier = append(newCarrier, objA)
+			}
+		}
+	}
+
+	// 互相不存在对方的数据加入 newCarrier
+	for _, obj := range carrierA {
+		if NotInSlice(obj, carrierB) {
+			newCarrier = append(newCarrier, obj)
+		}
+	}
+
+	for _, obj := range carrierB {
+		if NotInSlice(obj, carrierA) {
+			newCarrier = append(newCarrier, obj)
+		}
+	}
+
+	return newCarrier
+}
+
+// SubtractSlice 实现切片A-B的效果
+func SubtractSlice[T common.BasicData](carrierA, carrierB []T) []T {
+	newCarrier := make([]T, 0, len(carrierA))
+
+	for _, objA := range carrierA {
+		if NotInSlice(objA, carrierB) {
+			newCarrier = append(newCarrier, objA)
+		}
+
+	}
+
+	return newCarrier
 }
