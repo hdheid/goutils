@@ -59,17 +59,19 @@ import (
 
 // Dmask 将结构体中需要脱敏的部分进行脱敏，传地址
 func Dmask[T any](obj T) T {
-	return dmask(reflect.ValueOf(obj)).Interface().(T)
+	return dmask(reflect.ValueOf(obj), "").Interface().(T)
 }
 
-func dmask(oldVal reflect.Value) reflect.Value {
+func dmask(oldVal reflect.Value, tagCtx string) reflect.Value {
 	switch oldVal.Type().Kind() {
 	case reflect.Struct:
 		return structDmask(oldVal)
 	case reflect.Float64:
 		return oldVal
+	case reflect.Slice:
+		return sliceDmask(oldVal, tagCtx)
 	default:
-		panic("unhandled default case")
+		return oldVal
 	}
 }
 
@@ -85,11 +87,11 @@ func structDmask(oldVal reflect.Value) reflect.Value {
 		//判断字段的类型，是否是字符串
 		switch field.Type.Kind() {
 		case reflect.String:
-			s := StructString(tagCtx, oldVal.Field(i).String())
+			s := DString(tagCtx, oldVal.Field(i).String())
 			newVal.Field(i).SetString(s)
 
 		default:
-			subField := dmask(oldVal.Field(i))
+			subField := dmask(oldVal.Field(i), tagCtx)
 			newVal.Field(i).Set(subField)
 		}
 	}
@@ -97,7 +99,11 @@ func structDmask(oldVal reflect.Value) reflect.Value {
 	return newVal
 }
 
-func StructString(tagCtx, fieldCtx string) string {
+func DString(tagCtx, fieldCtx string) string {
+	if tagCtx == "" {
+		return fieldCtx
+	}
+
 	switch tagCtx {
 	case common.Email:
 		return EmlDmask(fieldCtx)
@@ -133,3 +139,22 @@ func PwdDmasl(pwd string) (string, error) {
 }
 
 // todo：密码加密，map，切片，普通字符串等等
+
+func sliceDmask(oldVal reflect.Value, tagCtx string) reflect.Value {
+	t := oldVal.Type()
+	newVal := reflect.MakeSlice(t, oldVal.Len(), oldVal.Len())
+
+	for i := 0; i < oldVal.Len(); i++ {
+		val := oldVal.Index(i)
+		switch t.Elem().Kind() { // 不加elem，获取的是切片类型，加上elem，获取的是切片的每一个元素的类型，使用 val.Kind() 能达到同样的效果
+		case reflect.String:
+			s := DString(tagCtx, val.String())
+			newVal.Index(i).SetString(s)
+		default:
+			subField := dmask(val, tagCtx)
+			newVal.Index(i).Set(subField)
+		}
+	}
+
+	return newVal
+}

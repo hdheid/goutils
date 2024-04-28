@@ -8,9 +8,9 @@ import (
 type Users struct {
 	Name     string
 	CardID   string
-	Email    string `dmask:"eml"`
-	TelNum   string `dmask:"tel"`
-	Password string `dmask:"pwd"`
+	Email    string   `dmask:"eml"`
+	TelNum   []string `dmask:"tel"`
+	Password string   `dmask:"pwd"`
 }
 
 type Persion struct {
@@ -23,7 +23,7 @@ func TestDmask(t *testing.T) {
 		Name:     "lh",
 		CardID:   "420116200309076611",
 		Email:    "422537262@qq.com",
-		TelNum:   "18694076387",
+		TelNum:   []string{"18694076387", "18694076387"},
 		Password: "122po1p11",
 	}
 
