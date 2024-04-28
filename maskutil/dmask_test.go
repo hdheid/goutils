@@ -13,6 +13,11 @@ type Users struct {
 	Password string `dmask:"pwd"`
 }
 
+type Persion struct {
+	User   Users
+	Length float64
+}
+
 func TestDmask(t *testing.T) {
 	user := Users{
 		Name:     "lh",
@@ -22,9 +27,14 @@ func TestDmask(t *testing.T) {
 		Password: "122po1p11",
 	}
 
-	maskUser := Dmask(user)
+	persion := Persion{
+		User:   user,
+		Length: 175.9,
+	}
 
-	fmt.Println(maskUser.Email)
-	fmt.Println(maskUser.TelNum)
-	fmt.Println(maskUser.Password)
+	maskUser := Dmask(persion)
+
+	fmt.Println(maskUser.User.Email)
+	fmt.Println(maskUser.User.TelNum)
+	fmt.Println(maskUser.User.Password)
 }

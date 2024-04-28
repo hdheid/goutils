@@ -7,24 +7,75 @@ import (
 	"regexp"
 )
 
+//// Dmask 将结构体中需要脱敏的部分进行脱敏，传地址
+//func Dmask[T any](obj T) T {
+//	return dmask(reflect.ValueOf(obj), reflect.Value{}).Interface().(T)
+//
+//	//switch v.Type().Kind() {
+//	//case reflect.Struct:
+//	//	NewStruct := dmask(v, reflect.Value{}).Interface()
+//	//	return NewStruct.(T)
+//	//default:
+//	//	panic("unhandled default case")
+//	//}
+//}
+//
+//func dmask(oldVal reflect.Value, newVal reflect.Value) reflect.Value {
+//	switch oldVal.Type().Kind() {
+//	case reflect.Struct:
+//		return structDmask(oldVal, newVal)
+//	case reflect.Float64:
+//		return oldVal
+//	default:
+//		panic("unhandled default case")
+//	}
+//}
+//
+//func structDmask(oldVal, newVal reflect.Value) reflect.Value {
+//	t := oldVal.Type()
+//	if !newVal.IsValid() { // 赋初始值
+//		newVal = reflect.New(t).Elem()
+//	}
+//
+//	for i := 0; i < t.NumField(); i++ {
+//		field := t.Field(i)
+//
+//		tagCtx := field.Tag.Get(common.Tag)
+//
+//		//判断字段的类型，是否是字符串
+//		switch field.Type.Kind() {
+//		case reflect.String:
+//			s := StructString(tagCtx, oldVal.Field(i).String())
+//			newVal.Field(i).SetString(s)
+//
+//		default:
+//			subField := dmask(oldVal.Field(i), newVal.Field(i))
+//			newVal.Field(i).Set(subField)
+//		}
+//	}
+//
+//	return newVal
+//}
+
 // Dmask 将结构体中需要脱敏的部分进行脱敏，传地址
 func Dmask[T any](obj T) T {
-	v := reflect.ValueOf(obj)
+	return dmask(reflect.ValueOf(obj)).Interface().(T)
+}
 
-	switch v.Type().Kind() {
+func dmask(oldVal reflect.Value) reflect.Value {
+	switch oldVal.Type().Kind() {
 	case reflect.Struct:
-		NewStruct := structDmask(v).Interface()
-		return NewStruct.(T)
+		return structDmask(oldVal)
+	case reflect.Float64:
+		return oldVal
 	default:
 		panic("unhandled default case")
 	}
-
-	return obj
 }
 
-func structDmask(v reflect.Value) reflect.Value {
-	t := v.Type()
-	newStruct := reflect.New(t).Elem()
+func structDmask(oldVal reflect.Value) reflect.Value {
+	t := oldVal.Type()
+	newVal := reflect.New(t).Elem()
 
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
@@ -34,14 +85,16 @@ func structDmask(v reflect.Value) reflect.Value {
 		//判断字段的类型，是否是字符串
 		switch field.Type.Kind() {
 		case reflect.String:
-			s := StructString(tagCtx, v.Field(i).String())
-			newStruct.Field(i).SetString(s)
+			s := StructString(tagCtx, oldVal.Field(i).String())
+			newVal.Field(i).SetString(s)
+
 		default:
-			panic("unhandled default case")
+			subField := dmask(oldVal.Field(i))
+			newVal.Field(i).Set(subField)
 		}
 	}
 
-	return newStruct
+	return newVal
 }
 
 func StructString(tagCtx, fieldCtx string) string {
