@@ -58,8 +58,17 @@ import (
 //}
 
 // Dmask 将结构体中需要脱敏的部分进行脱敏，传地址
-func Dmask[T any](obj T) T {
-	return dmask(reflect.ValueOf(obj), "").Interface().(T)
+func Dmask[T any](obj T, option ...string) T {
+	if len(option) == 0 { // 表示传入的值是结构体
+		return dmask(reflect.ValueOf(obj), "").Interface().(T)
+	}
+
+	// 参数仅支持字符串类型或者字符串切片等类型
+	if len(option) == 1 {
+		return dmaskWithOption(reflect.ValueOf(obj), option[0]).Interface().(T)
+	}
+
+	return obj
 }
 
 func dmask(oldVal reflect.Value, tagCtx string) reflect.Value {
@@ -110,7 +119,7 @@ func DString(tagCtx, fieldCtx string) string {
 	case common.Tel:
 		return TelDmask(fieldCtx)
 	case common.Password:
-		pwd, _ := PwdDmasl(fieldCtx)
+		pwd, _ := PwdDmask(fieldCtx)
 		return pwd
 	default:
 		return fieldCtx
@@ -129,16 +138,14 @@ func TelDmask(tel string) string {
 	return hiddenPhoneNumber
 }
 
-// PwdDmasl 针对密码，使用加密算法
-func PwdDmasl(pwd string) (string, error) {
+// PwdDmask 针对密码，使用加密算法
+func PwdDmask(pwd string) (string, error) {
 	hashPwd, err := validateutil.PasswordHash(pwd)
 	if err != nil {
 		return "", err
 	}
 	return hashPwd, nil
 }
-
-// todo：密码加密，map，切片，普通字符串等等
 
 func sliceDmask(oldVal reflect.Value, tagCtx string) reflect.Value {
 	t := oldVal.Type()

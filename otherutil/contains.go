@@ -1,4 +1,4 @@
-package structuitl
+package otherutil
 
 import (
 	"errors"
@@ -6,9 +6,9 @@ import (
 	"strings"
 )
 
-// ContainsWithReflect 判断某个元素是否存在于对应 carrier 的中
+// Contains 判断某个元素是否存在于对应 carrier 的中
 // todo: 待完善，后续支持更多数据类型
-func ContainsWithReflect(obj, carrier interface{}) (bool, error) {
+func Contains(obj, carrier interface{}) (bool, error) {
 	carrierType := reflect.ValueOf(carrier) //判断载体类型
 	objType := reflect.ValueOf(obj)
 	if carrierType.Kind() != objType.Kind() {

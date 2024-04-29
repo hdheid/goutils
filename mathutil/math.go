@@ -1,6 +1,9 @@
 package mathutil
 
-import "github.com/hdheid/goutils/common"
+import (
+	"github.com/hdheid/goutils/common"
+	"github.com/hdheid/goutils/otherutil"
+)
 
 func Max(nums ...int) (MaxNum int) {
 	MaxNum = common.MININT
@@ -28,4 +31,11 @@ func Sum(nums ...int) (SumNum int) {
 		SumNum += num
 	}
 	return SumNum
+}
+
+// GetPerc 求百分比函数
+func GetPerc[T common.IntData](a, b T) string {
+	cnt := float64(a) / float64(b) * 100
+
+	return otherutil.ToString(cnt) + "%"
 }
