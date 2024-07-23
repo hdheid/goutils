@@ -10,7 +10,7 @@ import (
 	文件路径的编写是相对于当前文件的，想进入父级目录，需要加../
 */
 
-// FileExist 通过文件路径判断该文件是否存再
+// FileExist 通过文件路径判断该文件是否存在
 func FileExist(filePath string) bool {
 	info, err := os.Stat(filePath)
 	if os.IsNotExist(err) || info == nil {

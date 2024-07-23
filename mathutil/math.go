@@ -2,7 +2,7 @@ package mathutil
 
 import (
 	"github.com/hdheid/goutils/common"
-	"github.com/hdheid/goutils/otherutil"
+	"strconv"
 )
 
 func Max(nums ...int) (MaxNum int) {
@@ -15,14 +15,14 @@ func Max(nums ...int) (MaxNum int) {
 	return MaxNum
 }
 
-func Min(nums ...int) (MaxNum int) {
-	MaxNum = common.MININT
+func Min(nums ...int) (MinNum int) {
+	MinNum = common.MAXINT
 	for _, num := range nums {
-		if num > MaxNum {
-			MaxNum = num
+		if num < MinNum {
+			MinNum = num
 		}
 	}
-	return MaxNum
+	return MinNum
 }
 
 func Sum(nums ...int) (SumNum int) {
@@ -37,5 +37,5 @@ func Sum(nums ...int) (SumNum int) {
 func GetPerc[T common.IntData](a, b T) string {
 	cnt := float64(a) / float64(b) * 100
 
-	return otherutil.ToString(cnt) + "%"
+	return strconv.FormatFloat(cnt, 'f', -1, 64) + "%"
 }

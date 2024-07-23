@@ -1,8 +1,7 @@
-package data_struct
+package deque
 
 import (
 	"fmt"
-	"github.com/hdheid/goutils/structuitl/data_struct/deque"
 	"testing"
 	"time"
 )
@@ -11,7 +10,7 @@ func TestDeque(T *testing.T) {
 
 	start := time.Now()
 
-	q := deque.New[int]()
+	q := New[int]()
 	for i := 0; i < 10000000; i++ {
 		//q.PushFront(i)
 		q.PushBack(i)
@@ -28,7 +27,7 @@ func TestDeque(T *testing.T) {
 
 // 压力测试
 func BenchmarkDeque(b *testing.B) {
-	q := deque.New[int]()
+	q := New[int]()
 	for i := 0; i < b.N; i++ {
 		q.PushFront(i)
 		q.PopFront()
