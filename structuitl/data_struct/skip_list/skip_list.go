@@ -17,11 +17,8 @@ import (
 
 const (
 	DefaultLevel = 10
-	Skip_list_P  = 0.5
+	SkipListP    = 0.5
 )
-
-type keyCmp[T any] func(a, b T) int
-type visitor[K, V any] func(key K, val V) bool
 
 // Node 跳表节点
 type Node[K, V any] struct {
@@ -44,7 +41,17 @@ type Elem[K, V any] struct {
 	val V
 }
 
-func New[K, V any](cmp keyCmp[K]) *SkipList[K, V] {
+type keyCmp[T any] func(a, b T) int
+type visitor[K, V any] func(key K, val V) bool
+type OpFunc[K, V any] func(list *SkipList[K, V])
+
+func WithMaxLevel[K, V any](maxLevel int) OpFunc[K, V] {
+	return func(list *SkipList[K, V]) {
+		list.maxLevel = maxLevel
+	}
+}
+
+func New[K, V any](cmp keyCmp[K], ops ...OpFunc[K, V]) *SkipList[K, V] {
 	l := &SkipList[K, V]{
 		maxLevel: DefaultLevel,
 		keyCmp:   cmp,
@@ -52,6 +59,10 @@ func New[K, V any](cmp keyCmp[K]) *SkipList[K, V] {
 		random:   rand.New(rand.NewSource(time.Now().Unix())),
 	}
 	l.head.next = make([]*Node[K, V], l.maxLevel)
+
+	for _, op := range ops {
+		op(l)
+	}
 
 	return l
 }
@@ -150,7 +161,7 @@ func (sl *SkipList[K, V]) Len() int {
 func (sl *SkipList[K, V]) randomLevel() (level int) {
 	rand.Seed(time.Now().UnixNano()) // 设置随机数种子
 	level = 1
-	for rand.Float64() < Skip_list_P && level < sl.maxLevel {
+	for rand.Float64() < SkipListP && level < sl.maxLevel {
 		level++
 	}
 	return
