@@ -2,13 +2,13 @@ package priority_queue
 
 import (
 	"fmt"
+	"github.com/hdheid/goutils/common/compare"
 	"testing"
 )
 
 func TestPriorityQueue(t *testing.T) {
-	q := New[int](func(a, b int) bool {
-		return a < b // 堆顶是最小的
-	})
+	//q := New[int](compare.IntLess) // 小根堆
+	q := New[int](compare.IntMore) // 大根堆
 
 	q.Push(5)
 	q.Push(2)

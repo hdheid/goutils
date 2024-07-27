@@ -2,16 +2,13 @@ package heap
 
 import (
 	"fmt"
+	"github.com/hdheid/goutils/common/compare"
 	"sort"
 	"testing"
 )
 
 func TestHeap(t *testing.T) {
-	cmpFunc := func(a, b int) bool {
-		return a < b // 堆顶是最小的
-	}
-
-	h := New[int](cmpFunc)
+	h := New[int](compare.IntLess)
 	a := make([]int, 0)
 
 	for i := 0; i < 10; i++ {

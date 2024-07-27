@@ -1,6 +1,7 @@
 package priority_queue
 
 import (
+	"github.com/hdheid/goutils/common/compare"
 	"github.com/hdheid/goutils/common/synch"
 	"github.com/hdheid/goutils/structuitl/data_struct/heap"
 	"sync"
@@ -20,7 +21,7 @@ func WithRWMutex[T any]() OpFunc[T] {
 	}
 }
 
-func New[T any](cmp heap.CmpFunc[T], ops ...OpFunc[T]) *PriorityQueue[T] {
+func New[T any](cmp compare.CmpFunc[T], ops ...OpFunc[T]) *PriorityQueue[T] {
 	pQueue := &PriorityQueue[T]{
 		h:    heap.New[T](cmp),
 		lock: synch.EmptyLock{},

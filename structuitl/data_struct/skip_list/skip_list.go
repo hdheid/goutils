@@ -1,6 +1,7 @@
 package skip_list
 
 import (
+	"github.com/hdheid/goutils/common/compare"
 	"github.com/hdheid/goutils/common/synch"
 	"math/rand"
 	"sync"
@@ -30,7 +31,7 @@ type Node[K, V any] struct {
 
 type SkipList[K, V any] struct {
 	head     Node[K, V]
-	keyCmp   keyCmp[K]
+	keyCmp   compare.CmpFunc[K]
 	maxLevel int
 	len      int
 	random   *rand.Rand
@@ -42,7 +43,6 @@ type Elem[K, V any] struct {
 	val V
 }
 
-type keyCmp[T any] func(a, b T) int
 type visitor[K, V any] func(key K, val V) bool
 type OpFunc[K, V any] func(list *SkipList[K, V])
 
@@ -59,7 +59,7 @@ func WithMaxLevel[K, V any](maxLevel int) OpFunc[K, V] {
 	}
 }
 
-func New[K, V any](cmp keyCmp[K], ops ...OpFunc[K, V]) *SkipList[K, V] {
+func New[K, V any](cmp compare.CmpFunc[K], ops ...OpFunc[K, V]) *SkipList[K, V] {
 	l := &SkipList[K, V]{
 		maxLevel: DefaultLevel,
 		keyCmp:   cmp,

@@ -1,21 +1,13 @@
 package skip_list
 
 import (
+	"github.com/hdheid/goutils/common/compare"
 	"sync"
 	"testing"
 )
 
 func TestInsert(t *testing.T) {
-	skipList := New[int, int](func(a, b int) int {
-		if a > b {
-			return 1
-		} else if a < b {
-			return -1
-		} else if a == b {
-			return 0
-		}
-		return 0
-	})
+	skipList := New[int, int](compare.IntSkipList)
 
 	mp := make(map[int]int)
 	for i := 0; i < 100; i++ {
@@ -41,7 +33,7 @@ func TestInsert(t *testing.T) {
 	}
 
 	for k, v := range mp {
-		val := skipList.Find(k)
+		val, _ := skipList.Find(k)
 		if v != val {
 			t.Error("skipList error! ", k, " ", v, " ", val)
 		}
@@ -93,7 +85,7 @@ func TestConcurrency(t *testing.T) {
 	}
 
 	for k, v := range mp {
-		val := skipList.Find(k)
+		val, _ := skipList.Find(k)
 		if v != val {
 			t.Error("skipList error! ", k, " ", v, " ", val)
 		}
@@ -138,7 +130,7 @@ func TestRemove(t *testing.T) {
 	}
 
 	for k, v := range mp {
-		val := skipList.Find(k)
+		val, _ := skipList.Find(k)
 		if v != val {
 			t.Error("skipList error! ", k, " ", v, " ", val)
 		}

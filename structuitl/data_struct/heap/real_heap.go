@@ -1,13 +1,13 @@
 package heap
 
-type CmpFunc[T any] func(a, b T) bool
+import "github.com/hdheid/goutils/common/compare"
 
 type Heap[T any] struct {
 	heap    []T
-	cmpFunc CmpFunc[T]
+	cmpFunc compare.CmpFunc[T]
 }
 
-func New[T any](cmpFunc CmpFunc[T], data ...T) *Heap[T] {
+func New[T any](cmpFunc compare.CmpFunc[T], data ...T) *Heap[T] {
 	h := &Heap[T]{
 		heap:    make([]T, 0),
 		cmpFunc: cmpFunc,
@@ -22,7 +22,7 @@ func New[T any](cmpFunc CmpFunc[T], data ...T) *Heap[T] {
 }
 
 func (h *Heap[T]) Len() int           { return len(h.heap) }
-func (h *Heap[T]) Less(i, j int) bool { return h.cmpFunc(h.heap[i], h.heap[j]) } // j比i大为真
+func (h *Heap[T]) Less(i, j int) bool { return h.cmpFunc(h.heap[i], h.heap[j]) > 0 } // j比i大为真
 func (h *Heap[T]) Swap(i, j int)      { h.heap[i], h.heap[j] = h.heap[j], h.heap[i] }
 
 func (h *Heap[T]) Push(x T) {
