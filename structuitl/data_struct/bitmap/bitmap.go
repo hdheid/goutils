@@ -75,6 +75,17 @@ func (b *Bitmap) Data() []byte {
 	return b.data
 }
 
+func (b *Bitmap) SizeExp() (exponent uint64) {
+	size := b.Size()
+	cnt := uint64(1)
+
+	for cnt < size {
+		cnt <<= 1
+		exponent++
+	}
+	return exponent
+}
+
 func (b *Bitmap) Expend(size uint64) uint64 {
 	// todo 目前是翻倍扩容
 	size = size << 1

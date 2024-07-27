@@ -1,6 +1,7 @@
 package skip_list
 
 import (
+	"github.com/hdheid/goutils/common/synch"
 	"math/rand"
 	"sync"
 	"time"
@@ -33,7 +34,7 @@ type SkipList[K, V any] struct {
 	maxLevel int
 	len      int
 	random   *rand.Rand
-	lock     sync.RWMutex // 读写锁
+	lock     synch.Locker
 }
 
 type Elem[K, V any] struct {
@@ -45,9 +46,16 @@ type keyCmp[T any] func(a, b T) int
 type visitor[K, V any] func(key K, val V) bool
 type OpFunc[K, V any] func(list *SkipList[K, V])
 
+// WithRWMutex 赋值函数
+func WithRWMutex[K, V any]() OpFunc[K, V] {
+	return func(sl *SkipList[K, V]) {
+		sl.lock = &sync.RWMutex{}
+	}
+}
+
 func WithMaxLevel[K, V any](maxLevel int) OpFunc[K, V] {
-	return func(list *SkipList[K, V]) {
-		list.maxLevel = maxLevel
+	return func(sl *SkipList[K, V]) {
+		sl.maxLevel = maxLevel
 	}
 }
 
@@ -55,7 +63,7 @@ func New[K, V any](cmp keyCmp[K], ops ...OpFunc[K, V]) *SkipList[K, V] {
 	l := &SkipList[K, V]{
 		maxLevel: DefaultLevel,
 		keyCmp:   cmp,
-		lock:     sync.RWMutex{},
+		lock:     synch.EmptyLock{},
 		random:   rand.New(rand.NewSource(time.Now().Unix())),
 	}
 	l.head.next = make([]*Node[K, V], l.maxLevel)
@@ -121,7 +129,7 @@ func (sl *SkipList[K, V]) Remove(key K) bool {
 	return true
 }
 
-func (sl *SkipList[K, V]) Find(key K) (val V) {
+func (sl *SkipList[K, V]) Find(key K) (val V, ok bool) {
 	sl.lock.RLock()
 	defer sl.lock.RUnlock()
 
@@ -130,7 +138,7 @@ func (sl *SkipList[K, V]) Find(key K) (val V) {
 		cur := node.next[i]
 		for ; cur != nil; cur = cur.next[i] {
 			if sl.keyCmp(cur.key, key) == 0 {
-				return cur.val
+				return cur.val, true
 			}
 			if sl.keyCmp(cur.key, key) > 0 {
 				break
@@ -140,14 +148,14 @@ func (sl *SkipList[K, V]) Find(key K) (val V) {
 	}
 
 	if node == nil {
-		return *new(V)
+		return *new(V), false
 	}
 
 	if sl.keyCmp(node.key, key) == 0 {
-		return node.val
+		return node.val, true
 	}
 
-	return *new(V)
+	return *new(V), false
 }
 
 func (sl *SkipList[K, V]) Len() int {

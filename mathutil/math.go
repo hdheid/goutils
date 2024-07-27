@@ -5,8 +5,8 @@ import (
 	"strconv"
 )
 
-func Max(nums ...int) (MaxNum int) {
-	MaxNum = common.MININT
+func Max[T common.NumberData](nums ...T) (MaxNum T) {
+	MaxNum = nums[0]
 	for _, num := range nums {
 		if num > MaxNum {
 			MaxNum = num
@@ -15,8 +15,8 @@ func Max(nums ...int) (MaxNum int) {
 	return MaxNum
 }
 
-func Min(nums ...int) (MinNum int) {
-	MinNum = common.MAXINT
+func Min[T common.NumberData](nums ...T) (MinNum T) {
+	MinNum = nums[0]
 	for _, num := range nums {
 		if num < MinNum {
 			MinNum = num
@@ -25,7 +25,7 @@ func Min(nums ...int) (MinNum int) {
 	return MinNum
 }
 
-func Sum(nums ...int) (SumNum int) {
+func Sum[T common.NumberData](nums ...T) (SumNum T) {
 	SumNum = 0
 	for _, num := range nums {
 		SumNum += num

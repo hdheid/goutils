@@ -58,7 +58,7 @@ func TestConcurrency(t *testing.T) {
 			return 0
 		}
 		return 0
-	})
+	}, WithRWMutex[int, int]())
 
 	mp := make(map[int]int)
 
