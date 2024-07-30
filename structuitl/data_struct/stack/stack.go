@@ -1,4 +1,4 @@
-package queue
+package stack
 
 import (
 	"github.com/hdheid/goutils/common/synch"
@@ -6,22 +6,22 @@ import (
 	"sync"
 )
 
-type OpFunc[T any] func(q *Queue[T])
+type OpFunc[T any] func(q *Stack[T])
 
-type Queue[T any] struct {
+type Stack[T any] struct {
 	dq   *deque.Deque[T]
 	lock synch.Locker
 }
 
 // WithRWMutex 赋值函数
 func WithRWMutex[T any]() OpFunc[T] {
-	return func(q *Queue[T]) {
+	return func(q *Stack[T]) {
 		q.lock = &sync.RWMutex{}
 	}
 }
 
-func New[T any](ops ...OpFunc[T]) *Queue[T] {
-	q := &Queue[T]{
+func New[T any](ops ...OpFunc[T]) *Stack[T] {
+	q := &Stack[T]{
 		dq:   deque.New[T](),
 		lock: synch.EmptyLock{},
 	}
@@ -33,56 +33,49 @@ func New[T any](ops ...OpFunc[T]) *Queue[T] {
 	return q
 }
 
-func (q *Queue[T]) Size() int {
+func (q *Stack[T]) Size() int {
 	q.lock.RLock()
 	defer q.lock.RUnlock()
 
 	return q.dq.Size()
 }
 
-func (q *Queue[T]) Empty() bool {
+func (q *Stack[T]) Empty() bool {
 	q.lock.RLock()
 	defer q.lock.RUnlock()
 
 	return q.dq.Empty()
 }
 
-func (q *Queue[T]) Push(val T) {
+func (q *Stack[T]) Push(val T) {
 	q.lock.Lock()
 	defer q.lock.Unlock()
 
 	q.dq.PushBack(val)
 }
 
-func (q *Queue[T]) Pop() T {
+func (q *Stack[T]) Pop() T {
 	q.lock.Lock()
 	defer q.lock.Unlock()
 
-	return q.dq.PopFront()
+	return q.dq.PopBack()
 }
 
-func (q *Queue[T]) Front() T {
-	q.lock.RLock()
-	defer q.lock.RUnlock()
-
-	return q.dq.Front()
-}
-
-func (q *Queue[T]) Back() T {
+func (q *Stack[T]) Top() T {
 	q.lock.RLock()
 	defer q.lock.RUnlock()
 
 	return q.dq.Back()
 }
 
-func (q *Queue[T]) Clear() {
+func (q *Stack[T]) Clear() {
 	q.lock.Lock()
 	defer q.lock.Unlock()
 
 	q.dq.Clear()
 }
 
-func (q *Queue[T]) String() string {
+func (q *Stack[T]) String() string {
 	q.lock.RLock()
 	defer q.lock.RUnlock()
 
