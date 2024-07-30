@@ -25,11 +25,11 @@ func TestDeque(T *testing.T) {
 	fmt.Println(end.String())
 }
 
-// 压力测试
+// 基准测试
 func BenchmarkDeque(b *testing.B) {
 	q := New[int]()
 	for i := 0; i < b.N; i++ {
 		q.PushFront(i)
-		q.PopFront()
+		//q.PopFront()
 	}
 }

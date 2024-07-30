@@ -16,3 +16,12 @@ func TestPriorityQueue(t *testing.T) {
 
 	fmt.Println(q.Top())
 }
+
+// 基准测试
+func BenchmarkPush(b *testing.B) {
+	q := New[int](compare.IntLess) // 小根堆
+
+	for i := 0; i < 1000; i++ {
+		q.Push(i)
+	}
+}

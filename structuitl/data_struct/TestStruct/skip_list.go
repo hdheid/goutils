@@ -2,21 +2,14 @@ package main
 
 import (
 	"fmt"
+	"github.com/hdheid/goutils/common/compare"
 	"github.com/hdheid/goutils/structuitl/data_struct/skip_list"
 )
 
 func main() {
-	l := skip_list.New[int, int](func(a, b int) int {
-		if a < b {
-			return 1
-		} else if a == b {
-			return 0
-		} else {
-			return -1
-		}
-	})
+	l := skip_list.New[int, int](compare.IntSkipList)
 
 	l.Insert(1, 1)
-	_, ok := l.Find(2)
+	_, ok := l.Find(1)
 	fmt.Println(ok)
 }
