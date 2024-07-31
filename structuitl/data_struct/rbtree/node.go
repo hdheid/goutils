@@ -28,6 +28,8 @@ func (n *Node[K, V]) IsRight() bool { return n == n.parent.right }
 
 func (n *Node[K, V]) IsLeft() bool { return n == n.parent.left }
 
+func (n *Node[K, V]) SetVal(val V) { n.val = val }
+
 func getColor[K, V any](n *Node[K, V]) Color {
 	if n == nil {
 		return Black
