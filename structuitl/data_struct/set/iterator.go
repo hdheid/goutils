@@ -14,10 +14,7 @@ func (iter *Iterator[T]) IsValid() bool {
 	iter.lock.RLock()
 	defer iter.lock.RUnlock()
 
-	if iter.it != nil {
-		return true
-	}
-	return false
+	return iter.it != nil
 }
 
 func (iter *Iterator[T]) Next() *Iterator[T] {

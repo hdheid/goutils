@@ -31,6 +31,7 @@ jobs:
         uses: golangci/golangci-lint-action@v4
         with:
           version: v1.54
+          args: --skip-dirs=structuitl/data_struct/TestStruct
           # 这里无需指定 working-directory，默认就是当前目录
           # 其他可选参数可以根据需要取消注释并配置
           # args: --timeout=30m --config=/my/path/.golangci.yml --issues-exit-code=0

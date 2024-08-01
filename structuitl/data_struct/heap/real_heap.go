@@ -12,9 +12,8 @@ func New[T any](cmpFunc compare.CmpFunc[T], data ...T) *Heap[T] {
 		heap:    make([]T, 0),
 		cmpFunc: cmpFunc,
 	}
-	for _, datum := range data {
-		h.heap = append(h.heap, datum)
-	}
+
+	h.heap = append(h.heap, data...)
 
 	Init[T](h)
 

@@ -175,11 +175,11 @@ func (d *Downloader) GetSlice(i int, offset, end int64, f *os.File) {
 	fmt.Println("分片打印完毕，打印范围为：", i, ":: ", offset, "----", end)
 }
 
-func (d *Downloader) RetryDownload() {
-	for {
-		select {
-		case index := <-d.RetryChannel:
-			d.GetSlice()
-		}
-	}
-}
+//func (d *Downloader) RetryDownload() {
+//	for {
+//		select {
+//		case index := <-d.RetryChannel:
+//			d.GetSlice()
+//		}
+//	}
+//}
