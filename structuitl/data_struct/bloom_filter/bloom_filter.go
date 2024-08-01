@@ -8,6 +8,8 @@ import (
 	"sync"
 )
 
+// todo 可以增加存储在磁盘等地方
+
 /*
 在哈希函数方便参考了 google 的 guava 中的布隆过滤器
 https://github.com/twmb/murmur3  哈希函数go语言实现

@@ -1,0 +1,40 @@
+name: Benchmark
+
+on:
+  push:
+    branches:
+      - main
+    pull_request:
+      branches:
+        - main
+    paths-ignore: # 下列文件的变更不触发工作流
+      - README.md
+      - LICENSE
+
+permissions:
+  contents: read
+
+jobs:
+  benchmark:
+    name: Run Benchmarks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.20'
+          cache: false
+
+      - name: Run Benchmarks
+        run: go test -run=NO_TEST -bench . -benchmem -benchtime 1s ./... > benchmark.txt
+
+
+      - name: Upload Benchmark Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results
+          path: benchmark.txt

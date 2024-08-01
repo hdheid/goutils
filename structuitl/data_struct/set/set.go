@@ -58,11 +58,7 @@ func (s *Set[T]) Exist(val T) bool {
 	defer s.lock.RUnlock()
 
 	node := s.tree.Find(val)
-	if node != nil {
-		return true
-	}
-
-	return false
+	return node != nil
 }
 
 func (s *Set[T]) Delete /*Erase*/ (val T) {
