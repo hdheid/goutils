@@ -43,7 +43,7 @@ func (t *RbTree[K, V]) Insert(key K, val V) {
 
 	for x != nil {
 		y = x
-		if t.keyCmp(key, x.Key()) < 0 {
+		if t.keyCmp(key, x.Key()) > 0 {
 			x = x.left
 		} else {
 			x = x.right
@@ -60,7 +60,7 @@ func (t *RbTree[K, V]) Insert(key K, val V) {
 	}
 
 	// todo：这里可否优化到上面的for循环中
-	if t.keyCmp(z.key, y.key) < 0 {
+	if t.keyCmp(z.key, y.key) > 0 {
 		y.left = z
 	} else {
 		y.right = z
@@ -72,9 +72,9 @@ func (t *RbTree[K, V]) Insert(key K, val V) {
 func (t *RbTree[K, V]) Find(key K) *Node[K, V] {
 	x := t.root
 	for x != nil {
-		if t.keyCmp(key, x.key) < 0 {
+		if t.keyCmp(key, x.key) > 0 {
 			x = x.left
-		} else if t.keyCmp(key, x.key) > 0 {
+		} else if t.keyCmp(key, x.key) < 0 {
 			x = x.right
 		} else {
 			return x

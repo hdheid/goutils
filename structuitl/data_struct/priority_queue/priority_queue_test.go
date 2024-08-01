@@ -8,7 +8,8 @@ import (
 
 func TestPriorityQueue(t *testing.T) {
 	//q := New[int](compare.IntLess) // 小根堆
-	q := New[int](compare.IntMore) // 大根堆
+	//q := New[int](compare.IntMore) // 大根堆
+	q := New[int](compare.IntPriorityQueue)
 
 	q.Push(5)
 	q.Push(2)

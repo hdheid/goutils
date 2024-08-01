@@ -1,20 +1,23 @@
 package compare
 
+// RbTreeFunc 自义定比对参数，需注意格式应与 IntMore 一致
+type RbTreeFunc[T any] CmpFunc[T]
+
 var (
-	IntRbTree   = IntMore
-	Int8RbTree  = Int8More
-	Int16RbTree = Int16More
-	Int32RbTree = Int32More
-	Int64RbTree = Int64More
+	IntRbTree   = IntLess
+	Int8RbTree  = Int8Less
+	Int16RbTree = Int16Less
+	Int32RbTree = Int32Less
+	Int64RbTree = Int64Less
 
-	UintRbTree   = UintMore
-	Uint8RbTree  = Uint8More
-	Uint16RbTree = Uint16More
-	Uint32RbTree = Uint32More
-	Uint64RbTree = Uint64More
+	UintRbTree   = UintLess
+	Uint8RbTree  = Uint8Less
+	Uint16RbTree = Uint16Less
+	Uint32RbTree = Uint32Less
+	Uint64RbTree = Uint64Less
 
-	Float32RbTree = Float32More
-	Float64RbTree = Float64More
+	Float32RbTree = Float32Less
+	Float64RbTree = Float64Less
 
-	StringRbTree = StringMore
+	StringRbTree = StringLess
 )
