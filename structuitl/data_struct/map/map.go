@@ -26,16 +26,16 @@ func WithRWMutex[K, V any]() OpFunc[K, V] {
 }
 
 func New[K, V any](cmp compare.CmpFunc[K], ops ...OpFunc[K, V]) *Map[K, V] {
-	q := &Map[K, V]{
+	m := &Map[K, V]{
 		tree: rbtree.New[K, V](cmp),
 		lock: synch.EmptyLock{},
 	}
 
 	for _, op := range ops {
-		op(q)
+		op(m)
 	}
 
-	return q
+	return m
 }
 
 func (m *Map[K, V]) Insert(key K, val V) {
