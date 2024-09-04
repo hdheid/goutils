@@ -78,27 +78,27 @@ func (r *Ring[T]) clear() {
 }
 
 // insert 在 posIdx 处插入一个数据，环的数据插入，由于是一个环，如果插入地方离头近，则移动前半部分，否则移动后半部分
-func (r *Ring[T]) insert(posIdx int, obj T) {
-	if posIdx*2 < r.size {
-		idx := r.preIdx(r.begin)
-		for i := 0; i < posIdx; i++ {
-			r.data[idx] = r.data[r.nextIdx(idx)]
-			idx = r.nextIdx(idx)
-		}
-		r.data[idx] = obj
-		r.preBegin()
-	} else {
-		idx := r.end
-		for i := 0; i < r.size-posIdx; i++ {
-			r.data[idx] = r.data[r.preIdx(idx)]
-			idx = r.preIdx(idx)
-		}
-		r.data[idx] = obj
-		r.nextEnd()
-	}
-
-	r.size++
-}
+// func (r *Ring[T]) insert(posIdx int, obj T) {
+//	if posIdx*2 < r.size {
+//		idx := r.preIdx(r.begin)
+//		for i := 0; i < posIdx; i++ {
+//			r.data[idx] = r.data[r.nextIdx(idx)]
+//			idx = r.nextIdx(idx)
+//		}
+//		r.data[idx] = obj
+//		r.preBegin()
+//	} else {
+//		idx := r.end
+//		for i := 0; i < r.size-posIdx; i++ {
+//			r.data[idx] = r.data[r.preIdx(idx)]
+//			idx = r.preIdx(idx)
+//		}
+//		r.data[idx] = obj
+//		r.nextEnd()
+//	}
+//
+//	r.size++
+// }
 
 func (r *Ring[T]) getIdx(idx int) T {
 	if idx < 0 || idx > r.size {

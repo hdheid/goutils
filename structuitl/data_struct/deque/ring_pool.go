@@ -35,3 +35,7 @@ func (p *RingPool[T]) shrinkPool(newSize int) {
 		p.rings = newRings
 	}
 }
+
+func (p *RingPool[T]) clear() {
+	p.rings = p.rings[:0]
+}

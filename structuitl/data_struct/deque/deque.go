@@ -46,9 +46,9 @@ func (d *Deque[T]) PopFront() T {
 		d.rings[d.begin] = nil
 		d.begin = d.nextIdx(d.begin)
 	}
-	//d.size--
-	d.shrinkDeuqe()
-	d.size-- // 将这个往上放，在不断地一次push和pop操作中，时间损耗会越来越大，因为在不断地进行收缩和池收缩操作
+	d.size-- // 需要放在前面，否则 shrinkDeque() 中 d.size() 会不准确 todo：是否可以尝试，判断一下收缩的条件拓宽一点
+	d.shrinkDeque()
+	// d.size-- // 将这个往上放，在不断地一次push和pop操作中，时间损耗会越来越大，因为在不断地进行收缩和池收缩操作
 	return obj
 }
 
@@ -68,7 +68,7 @@ func (d *Deque[T]) PopBack() T {
 		d.end = d.preIdx(d.end)
 	}
 	//d.size--
-	d.shrinkDeuqe()
+	d.shrinkDeque()
 	d.size-- //同上
 	return obj
 }
@@ -99,7 +99,11 @@ func (d *Deque[T]) Empty() bool {
 
 // Clear todo:
 func (d *Deque[T]) Clear() {
-
+	d.rings = d.rings[:0]
+	d.pool.clear()
+	d.begin = 0
+	d.end = 0
+	d.size = 0
 }
 
 func (d *Deque[T]) GetIdx(idx int) T {
@@ -148,7 +152,7 @@ func (d *Deque[T]) getFirstRing() *Ring[T] {
 		return s
 	}
 
-	if d.rings[d.begin] == nil && !d.rings[d.begin].isFull() {
+	if d.rings[d.begin] != nil && !d.rings[d.begin].isFull() {
 		return d.rings[d.begin]
 	}
 
@@ -221,19 +225,21 @@ func (d *Deque[T]) expand() {
 		ringsIdx := (d.begin + i) % d.ringUsed()
 		newRings[i] = d.rings[ringsIdx]
 	}
+	posEnd := d.ringUsed()
+
 	d.begin = 0
-	d.end = d.ringUsed()
+	d.end = posEnd
 	d.rings = newRings
 }
 
 // 缩小，两倍缩小
-func (d *Deque[T]) shrinkDeuqe() {
+func (d *Deque[T]) shrinkDeque() {
 	if int(float64(d.ringUsed()*2)*1.2) < len(d.rings) { // 如果空余的内存超过一定阈值，就进行缩小操作，需要留出一点空间避频繁的删除
 		newCap := len(d.rings) / 2
 		newRings := make([]*Ring[T], newCap)
 
 		for i := 0; i < d.ringUsed(); i++ {
-			ringsIdx := (d.begin + i) % d.ringUsed()
+			ringsIdx := (d.begin + i) % len(d.rings)
 			newRings[i] = d.rings[ringsIdx]
 		}
 

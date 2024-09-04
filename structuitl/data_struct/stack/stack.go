@@ -51,14 +51,14 @@ func (q *Stack[T]) Push(val T) {
 	q.lock.Lock()
 	defer q.lock.Unlock()
 
-	q.dq.PushBack(val)
+	q.dq.PushFront(val)
 }
 
 func (q *Stack[T]) Pop() T {
 	q.lock.Lock()
 	defer q.lock.Unlock()
 
-	return q.dq.PopBack()
+	return q.dq.PopFront()
 }
 
 func (q *Stack[T]) Top() T {

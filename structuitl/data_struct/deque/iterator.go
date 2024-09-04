@@ -7,7 +7,7 @@ type DequeIterator[T any] struct {
 
 // IsValid 判断该迭代器是否有效
 func (it *DequeIterator[T]) IsValid() bool {
-	if it.position < 0 || it.position > it.dq.Size() {
+	if it.position < 0 || it.position >= it.dq.Size() {
 		return false
 	}
 
@@ -18,8 +18,8 @@ func (it *DequeIterator[T]) Value() T {
 	return it.dq.GetIdx(it.position)
 }
 
-func (it *DequeIterator[T]) SetValue(idx int, obj T) {
-	it.dq.Set(idx, obj)
+func (it *DequeIterator[T]) SetValue(obj T) {
+	it.dq.Set(it.position, obj)
 }
 
 func (it *DequeIterator[T]) Next() *DequeIterator[T] {
@@ -45,7 +45,7 @@ func (it *DequeIterator[T]) Clone() *DequeIterator[T] {
 	}
 }
 
-func (it *DequeIterator[T]) Euqal(other *DequeIterator[T]) bool {
+func (it *DequeIterator[T]) Equal(other *DequeIterator[T]) bool {
 	if other.dq == it.dq && other.position == it.position {
 		return true
 	}

@@ -32,7 +32,7 @@ func (h *Heap[T]) Push(x T) {
 
 func (h *Heap[T]) Pop() T {
 	if h.Len() == 0 {
-		return *new(T)
+		panic("heap is empty")
 	}
 	old := h.heap
 	n := len(old)
@@ -43,7 +43,7 @@ func (h *Heap[T]) Pop() T {
 
 func (h *Heap[T]) Top() T {
 	if h.Len() == 0 {
-		return *new(T)
+		panic("heap is empty")
 	}
 
 	return h.heap[0]
