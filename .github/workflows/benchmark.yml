@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - main
-    pull_request:
-      branches:
-        - main
     paths-ignore: # 下列文件的变更不触发工作流
       - README.md
       - LICENSE

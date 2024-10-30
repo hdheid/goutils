@@ -1,0 +1,1 @@
+该项目来自 [bytebufferpool](https://github.com/valyala/bytebufferpool/blob/master/pool.go) ，该项目的代码遵循 MIT 许可证。
