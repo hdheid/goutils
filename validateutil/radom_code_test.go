@@ -19,3 +19,8 @@ func TestRepeatCode(t *testing.T) {
 		}
 	}
 }
+
+func TestGenValidateString(t *testing.T) {
+	l := 16
+	t.Log(GenValidateString(l, 5))
+}

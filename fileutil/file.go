@@ -1,6 +1,8 @@
 package fileutil
 
 import (
+	"image"
+	"image/png"
 	"log"
 	"net/http"
 	"os"
@@ -36,4 +38,20 @@ func GetFileType(filePath string) (string, error) {
 
 	fileType := http.DetectContentType(buffer)
 	return fileType, nil
+}
+
+// SaveImageToCurrentDir 保存 image.Image 类型文件到当前目录
+func SaveImageToCurrentDir(img image.Image, fileName string) error {
+	file, err := os.Create(fileName)
+	if err != nil {
+		return err
+	}
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+			panic(err)
+		}
+	}(file)
+
+	return png.Encode(file, img)
 }
