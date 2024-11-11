@@ -15,6 +15,9 @@ import (
 	"github.com/hdheid/goutils/validateutil"
 	"hash"
 	"math"
+	"net/url"
+	"sort"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -34,42 +37,46 @@ type Algorithm int
 type OpFunc func(t *Totp)
 
 type Totp struct {
-	secret        string    // 密钥，用于生成密码
-	expiration    int       // 密码有效期
-	size          int       // 密码长度
-	hashAlgorithm Algorithm // 加密算法
+	Secret        string    // 密钥，用于生成密码
+	Expiration    int       // 密码有效期
+	Size          int       // 密码长度
+	HashAlgorithm Algorithm // 加密算法
 }
 
+// WithAlgorithm 设置使用的，默认SHA1，可选择有 “SHA1，SHA256，SHA512，MD5”，为保证兼容性，建议使用默认哈希算法
 func WithAlgorithm(algorithm Algorithm) OpFunc {
 	return func(t *Totp) {
-		t.hashAlgorithm = algorithm
+		t.HashAlgorithm = algorithm
 	}
 }
 
+// WithSize 设置生成一次性密码长度
 func WithSize(size int) OpFunc {
 	return func(t *Totp) {
-		t.size = size
+		t.Size = size
 	}
 }
 
+// WithExpiration 设置密码刷新间隔时间
 func WithExpiration(expiration int) OpFunc {
 	return func(t *Totp) {
-		t.expiration = expiration
+		t.Expiration = expiration
 	}
 }
 
+// WithSecret 设置一次性密码密钥，应符合 base32 字符集
 func WithSecret(secret string) OpFunc {
 	return func(t *Totp) {
-		t.secret = secret
+		t.Secret = secret
 	}
 }
 
 func NewTotp(ops ...OpFunc) *Totp {
 	t := &Totp{ // 默认值
-		secret:        validateutil.GenValidateString(common.Default_Secret_Size, 5),
-		expiration:    common.Default_Expiration, // 默认30秒
-		size:          common.Default_Size,       // 默认6
-		hashAlgorithm: SHA1,                      // 默认sha1
+		Secret:        validateutil.GenValidateString(common.Default_Secret_Size, 5),
+		Expiration:    common.Default_Expiration, // 默认30秒
+		Size:          common.Default_Size,       // 默认6
+		HashAlgorithm: SHA1,                      // 默认sha1
 	}
 
 	for _, op := range ops {
@@ -82,19 +89,19 @@ func NewTotp(ops ...OpFunc) *Totp {
 // GeneratePwd 生成密码
 func (t *Totp) GeneratePwd() (pwd string, err error) {
 	// 第一部，获取密钥，base32编码必须是8的倍数，全部大写，如果不是，需要填充’=‘
-	secret := sercetFormat(t.secret)
+	secret := sercetFormat(t.Secret)
 	sBytes, err := base32.StdEncoding.DecodeString(secret)
 	if err != nil {
 		return "", err
 	}
 
 	// 第二步，获取当前时间戳
-	c := uint64(time.Now().Unix()) / uint64(t.expiration)
+	c := uint64(time.Now().Unix()) / uint64(t.Expiration)
 	buf := make([]byte, 8)
 	binary.BigEndian.PutUint64(buf, c)
 
 	// 获取密码
-	mac := hmac.New(t.hashAlgorithm.GetAlgorithm(), sBytes)
+	mac := hmac.New(t.HashAlgorithm.GetAlgorithm(), sBytes)
 	mac.Write(buf)
 	sum := mac.Sum(nil)
 
@@ -105,10 +112,10 @@ func (t *Totp) GeneratePwd() (pwd string, err error) {
 		((int(sum[offset+2] & 0xff)) << 8) |
 		(int(sum[offset+3]) & 0xff))
 	// 得到取模后的数字
-	mod := int32(value % int64(math.Pow10(t.size)))
+	mod := int32(value % int64(math.Pow10(t.Size)))
 
 	// 位数不足前面取零
-	f := fmt.Sprintf("%%0%dd", t.size)
+	f := fmt.Sprintf("%%0%dd", t.Size)
 	password := fmt.Sprintf(f, mod)
 
 	return password, nil
@@ -116,7 +123,7 @@ func (t *Totp) GeneratePwd() (pwd string, err error) {
 
 func (t *Totp) ValidatePwd(pwd string) (bool, error) {
 	pwd = strings.TrimSpace(pwd)
-	if len(pwd) != t.size {
+	if len(pwd) != t.Size {
 		return false, errors.New("长度不一致")
 	}
 
@@ -131,6 +138,22 @@ func (t *Totp) ValidatePwd(pwd string) (bool, error) {
 	}
 
 	return false, errors.New("认证失败")
+}
+
+func (t *Totp) GetUrl(issuer, account string) url.URL {
+	u := url.Values{}
+	u.Set(common.SECRET, t.Secret)
+	u.Set(common.ISSUER, issuer)
+	u.Set(common.PERIOD, strconv.FormatUint(uint64(t.Expiration), 10))
+	u.Set(common.ALGORITHM, t.HashAlgorithm.String())
+	u.Set(common.DIGITS, strconv.Itoa(t.Size))
+
+	return url.URL{
+		Scheme:   "otpauth",
+		Host:     "totp",
+		Path:     "/" + issuer + ":" + account,
+		RawQuery: EncodeQuery(u),
+	}
 }
 
 func (a Algorithm) GetAlgorithm() (h func() hash.Hash) {
@@ -170,4 +193,32 @@ func sercetFormat(pwd string) string {
 	}
 
 	return strings.ToUpper(pwd)
+}
+
+// EncodeQuery is a copy-paste of url.Values.Encode, except it uses %20 instead
+// of + to encode spaces. This is necessary to correctly render spaces in some
+// authenticator apps, like Google Authenticator.
+func EncodeQuery(v url.Values) string {
+	if v == nil {
+		return ""
+	}
+	var buf strings.Builder
+	keys := make([]string, 0, len(v))
+	for k := range v {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for _, k := range keys {
+		vs := v[k]
+		keyEscaped := url.PathEscape(k) // changed from url.QueryEscape
+		for _, v := range vs {
+			if buf.Len() > 0 {
+				buf.WriteByte('&')
+			}
+			buf.WriteString(keyEscaped)
+			buf.WriteByte('=')
+			buf.WriteString(url.PathEscape(v)) // changed from url.QueryEscape
+		}
+	}
+	return buf.String()
 }

@@ -3,6 +3,7 @@ package totp
 import (
 	"fmt"
 	"github.com/hdheid/goutils/fileutil"
+	"github.com/hdheid/goutils/otputil"
 	"testing"
 	"time"
 )
@@ -18,10 +19,8 @@ func TestTotp_GeneratePwd(t *testing.T) {
 
 func TestGetQrCode(t *testing.T) {
 	totp := NewTotp()
-	l := NewOtpUrl("abcd", "abcd@foxmail.com", totp)
-	k, _ := l.GetUrl()
-
-	img, err := k.Image(100, 100)
+	l := otputil.NewOtpUrl("abcd", "abcd@foxmail.com", totp)
+	img, err := l.GetImage(100, 100)
 	if err != nil {
 		t.Error(err)
 	}
@@ -30,8 +29,6 @@ func TestGetQrCode(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
-	fmt.Println(k.orig)
 
 	for {
 		pwd, _ := totp.GeneratePwd()
