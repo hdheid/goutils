@@ -149,19 +149,3 @@ func SubtractSlice[T common.BasicData](carrierA, carrierB []T) []T {
 
 	return newCarrier
 }
-
-// ChunkSlice 将切片分块，每个子切片的长度不为 chunkSize
-func ChunkSlice[T any](slice []T, chunkSize int) [][]T {
-	if chunkSize <= 0 {
-		return nil
-	}
-	chunks := make([][]T, 0, (len(slice)+chunkSize-1)/chunkSize)
-	for i := 0; i < len(slice); i += chunkSize {
-		end := i + chunkSize
-		if end > len(slice) {
-			end = len(slice)
-		}
-		chunks = append(chunks, slice[i:end])
-	}
-	return chunks
-}
